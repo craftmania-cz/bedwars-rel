@@ -22,7 +22,8 @@ public class ServerListener extends BaseListener {
       return;
     }
 
-    Game game = Main.getInstance().getGameManager().getGames().get(0);
+    int selectedGame = Main.getInstance().getGameManager().getSelectedGame();
+    Game game = Main.getInstance().getGameManager().getGames().get(selectedGame);
 
     if (game == null) {
       return;
