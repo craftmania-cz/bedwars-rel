@@ -183,6 +183,10 @@ public class Game {
     return "\u2714";
   }
 
+  public String getName() {
+    return name;
+  }
+
   /*
    * PUBLIC
    */
