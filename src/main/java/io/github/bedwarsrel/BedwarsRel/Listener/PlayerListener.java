@@ -89,7 +89,9 @@ public class PlayerListener extends BaseListener {
 
     if (Main.getInstance().isBungee()) {
       je.setJoinMessage(null);
-      final Game firstGame = games.get(0);
+      int selectedGame = Main.getInstance().getGameManager().getSelectedGame();
+      final Game firstGame = games.get(selectedGame);
+      System.out.println("Joined... " + firstGame.getName());
 
       if (firstGame.getState() == GameState.STOPPED && player.hasPermission("bw.setup")) {
         return;

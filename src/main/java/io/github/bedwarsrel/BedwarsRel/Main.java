@@ -151,6 +151,7 @@ public class Main extends JavaPlugin {
     // Loading
     this.scoreboardManager = Bukkit.getScoreboardManager();
     this.gameManager.loadGames();
+    this.gameManager.generateRandomArena();
     this.startTimeListener();
     this.startMetricsIfEnabled();
 

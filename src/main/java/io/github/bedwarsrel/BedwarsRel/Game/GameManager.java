@@ -27,6 +27,7 @@ public class GameManager {
 
   private ArrayList<Game> games = null;
   private Map<Player, Game> gamePlayer = null;
+  private int selectedGameInList = 0;
 
   public GameManager() {
     this.games = new ArrayList<Game>();
@@ -374,5 +375,27 @@ public class GameManager {
   public int getGamePlayerAmount() {
     return this.gamePlayer.size();
   }
+
+  // Vraci ID z listu all her
+  //TODO: Predelat na Game objekt
+  public void generateRandomArena() {
+    int n = randomRangeInt(0, this.games.size());
+    Game game = this.games.get(n);
+    System.out.println("Zvolena arena: " + game.getName());
+    setSelectedGame(n);
+  }
+
+  public int getSelectedGame() {
+    return selectedGameInList;
+  }
+
+  public void setSelectedGame(int selectedGameInList) {
+    this.selectedGameInList = selectedGameInList;
+  }
+
+  public static int randomRangeInt(int min, int max) {
+    return (int) (Math.random() < 0.5 ? ((1 - Math.random()) * (max - min) + min) : (Math.random() * (max - min) + min));
+  }
+
 
 }
