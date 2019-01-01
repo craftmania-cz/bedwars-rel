@@ -4,13 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -80,6 +77,7 @@ public class Game {
   private int timeLeft = 0;
   private boolean isOver = false;
   private boolean isStopping = false;
+  private org.bukkit.scoreboard.Team timeT;
 
   private Location hologramLocation = null;
 
@@ -144,6 +142,7 @@ public class Game {
     this.playerSettings = new HashMap<Player, PlayerSettings>();
 
     this.autobalance = Main.getInstance().getBooleanConfig("global-autobalance", false);
+    this.timeT = this.scoreboard.registerNewTeam("timetime");
 
     if (Main.getInstance().isBungee()) {
       this.cycle = new BungeeGameCycle(this);
@@ -175,7 +174,14 @@ public class Game {
     return player.getDisplayName() + before + playerAdding + before;
   }
 
-  public static String bedLostString() {
+  public String bedLostString(Team t) {
+    if (t.isDead(this)) {
+      if (t.getPlayers().size() > 0) {
+        return ChatColor.translateAlternateColorCodes('&',"&a" + t.getPlayers().size());
+      } else {
+        return "\u2718";
+      }
+    }
     return "\u2718";
   }
 
@@ -1134,9 +1140,19 @@ public class Game {
           Main.getInstance().getStringConfig("scoreboard.format-bed-alive", "&a$status$ $team$");
     }
 
-    format = format.replace("$status$", (destroyed) ? Game.bedLostString() : Game.bedExistString());
+    format = format.replace("$status$", (destroyed) ? bedLostString(team) : Game.bedExistString());
     format = format.replace("$team$", team.getChatColor() + team.getName());
+    return ChatColor.translateAlternateColorCodes('&', format);
+  }
 
+  private String formatScoreboardTeamWhenDestroyed(Team team, int size) {
+    String format = null;
+
+    if (team == null) {
+      return "";
+    }
+
+    format = team.getChatColor() + team.getDisplayName() + "&f: &a" + size;
     return ChatColor.translateAlternateColorCodes('&', format);
   }
 
@@ -1202,18 +1218,49 @@ public class Game {
     obj.setDisplaySlot(DisplaySlot.SIDEBAR);
     obj.setDisplayName(this.formatScoreboardTitle());
 
+    obj.getScore(ChatColor.translateAlternateColorCodes('&', "&7" + getFormattedDate())).setScore(this.teams.size() + 6);
+
+    Score space = obj.getScore(ChatColor.translateAlternateColorCodes('&', "&f"));
+    space.setScore(this.teams.size() + 5); //pod titlom
+    obj.getScore(ChatColor.translateAlternateColorCodes('&', "&a")).setScore(this.teams.size() + 4);
+
+    timeT.addEntry(ChatColor.translateAlternateColorCodes('&', "&a"));
+    timeT.setPrefix(ChatColor.translateAlternateColorCodes('&', "&fCas: &a"));
+    timeT.setSuffix(getFormattedTimeLeft());
+
+    obj.getScore(ChatColor.translateAlternateColorCodes('&', "&6")).setScore(this.teams.size() + 3);
+    List<Team> teams = new ArrayList<>();
     for (Team t : this.teams.values()) {
+      teams.add(t);
+    }
+    teams.sort(Comparator.comparing(Team::getDisplayName));
+    int start = teams.size() + 2;
+    for (Team t : teams) {
       this.scoreboard.resetScores(this.formatScoreboardTeam(t, false));
       this.scoreboard.resetScores(this.formatScoreboardTeam(t, true));
 
       boolean teamDead = (t.isDead(this) && this.getState() == GameState.RUNNING) ? true : false;
-      Score score = obj.getScore(this.formatScoreboardTeam(t, teamDead));
-      score.setScore(t.getPlayers().size());
+      Score sc = obj.getScore(this.formatScoreboardTeam(t, teamDead));
+      sc.setScore(start);
+      start -= 1;
+
+      if (teamDead && t.getPlayers().size() == 0) {
+        this.scoreboard.resetScores(ChatColor.translateAlternateColorCodes('&',  t.getDisplayName() + "&f: &c&a1"));
+      }
     }
+
+    obj.getScore(ChatColor.translateAlternateColorCodes('&', "&9")).setScore(2);
+    obj.getScore(ChatColor.translateAlternateColorCodes('&', "&7mc.craftmania.cz")).setScore(1); //dole
 
     for (Player player : this.getPlayers()) {
       player.setScoreboard(this.scoreboard);
     }
+  }
+
+  private String getFormattedDate() {
+      SimpleDateFormat dtf = new SimpleDateFormat("dd/MM/yyyy");
+      Date date = Calendar.getInstance().getTime();
+      return dtf.format(date);
   }
 
   public void setScoreboard(Scoreboard sb) {
@@ -1851,7 +1898,7 @@ public class Game {
       obj = this.scoreboard.registerNewObjective("display", "dummy");
     }
 
-    obj.setDisplayName(this.formatScoreboardTitle());
+    timeT.setSuffix(getFormattedTimeLeft());
 
     for (Player player : this.getPlayers()) {
       player.setScoreboard(this.scoreboard);
