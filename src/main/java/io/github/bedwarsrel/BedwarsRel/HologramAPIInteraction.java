@@ -13,15 +13,13 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import de.inventivegames.hologram.Hologram;
-import de.inventivegames.hologram.HologramAPI;
-import de.inventivegames.hologram.view.ViewHandler;
 import io.github.bedwarsrel.BedwarsRel.Statistics.PlayerStatistic;
 import io.github.bedwarsrel.BedwarsRel.Statistics.StatField;
 import io.github.bedwarsrel.BedwarsRel.Utils.ChatWriter;
 import io.github.bedwarsrel.BedwarsRel.Utils.Utils;
 import lombok.Getter;
 
+/*
 public class HologramAPIInteraction implements IHologramInteraction {
 
   @Getter
@@ -194,14 +192,16 @@ public class HologramAPIInteraction implements IHologramInteraction {
           return line;
         }
       });
-      /*
+      */
+/*
        * holo.setTouchable(true); holo.addTouchHandler(new TouchHandler() {
        * 
        * @Override public void onTouch(Hologram hologram, Player player, TouchAction action) {
        * HologramAPIInteraction.this.onHologramTouch(player, hologram); }
        * 
        * });
-       */
+       *//*
+
       holo.spawn();
       holograms.add(holo);
       currentLine++;
@@ -235,3 +235,4 @@ public class HologramAPIInteraction implements IHologramInteraction {
   }
 
 }
+*/

@@ -24,7 +24,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.ScoreboardManager;
-import org.mcstats.Metrics;
 
 import com.bugsnag.Bugsnag;
 import com.bugsnag.Report;
@@ -153,17 +152,15 @@ public class Main extends JavaPlugin {
     this.gameManager.loadGames();
     this.gameManager.generateRandomArena();
     this.startTimeListener();
-    this.startMetricsIfEnabled();
 
     // holograms
-    if (this.isHologramsEnabled()) {
-      if (this.getServer().getPluginManager().isPluginEnabled("HologramAPI")) {
-        this.holographicInteraction = new HologramAPIInteraction();
-      } else if (this.getServer().getPluginManager().isPluginEnabled("HolographicDisplays")) {
+    //TODO: Disabled need fix!
+    /*if (this.isHologramsEnabled()) {
+      if (this.getServer().getPluginManager().isPluginEnabled("HolographicDisplays")) {
         this.holographicInteraction = new HolographicDisplaysInteraction();
       }
       this.holographicInteraction.loadHolograms();
-    }
+    }*/
   }
 
   private void registerBugsnag() {
@@ -617,19 +614,6 @@ public class Main extends JavaPlugin {
     }
 
     return false;
-  }
-
-  public void startMetricsIfEnabled() {
-    if (this.metricsEnabled()) {
-      try {
-        Metrics metrics = new Metrics(this);
-        metrics.start();
-      } catch (Exception ex) {
-        Main.getInstance().getBugsnag().notify(ex);
-        this.getServer().getConsoleSender().sendMessage(ChatWriter
-            .pluginMessage(ChatColor.RED + "Metrics are enabled, but couldn't send data!"));
-      }
-    }
   }
 
   public String getFallbackLocale() {
